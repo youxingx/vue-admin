@@ -8,7 +8,8 @@ module.exports = {
     // 输出文件目录
     outputDir: process.env.NODE_ENV === "production" ? "dist":"devdist",
     // eslint-loader 是否在保存的时候检查
-    lintOnSave: true,
+    // lintOnSave: true,
+    lintOnSave: false,
     // use the full build with in-browser compiler?
     // https://vuejs.org/v2/guide/installation.html#Runtime-Compiler-vs-Runtime-only
     //   compiler: false,

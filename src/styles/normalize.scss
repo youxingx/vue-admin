@@ -7,6 +7,10 @@
  * 1. Correct the line height in all browsers.
  * 2. Prevent adjustments of font size after orientation changes in iOS.
  */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
 
 html {
   line-height: 1.15; /* 1 */
@@ -22,6 +26,9 @@ html {
 
 body {
   margin: 0;
+  font-family: "Microsoft YaHei";
+  //font-weight: 300;
+  font-size: 12px;
 }
 
 /**
