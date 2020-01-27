@@ -1,38 +1,41 @@
 <template>
     <div id="login">
-        这是登录页
-        <div>
-            <el-button>默认按钮</el-button>
-            <el-button type="primary">主要按钮</el-button>
-            <el-button type="success">成功按钮</el-button>
-            <el-button type="info">信息按钮</el-button>
-            <el-button type="warning">警告按钮</el-button>
-            <el-button type="danger">危险按钮</el-button>
-        </div>
-
-        <div style="margin: 20px 0">
-            <el-button plain>朴素按钮</el-button>
-            <el-button type="primary" plain>主要按钮</el-button>
-            <el-button type="success" plain>成功按钮</el-button>
-            <el-button type="info" plain>信息按钮</el-button>
-            <el-button type="warning" plain>警告按钮</el-button>
-            <el-button type="danger" plain>危险按钮</el-button>
-        </div>
-
-        <div>
-            <el-button round>圆形按钮</el-button>
-            <el-button type="primary" round>主要按钮</el-button>
-            <el-button type="success" round>成功按钮</el-button>
-            <el-button type="info" round>信息按钮</el-button>
-            <el-button type="warning" round>警告按钮</el-button>
-            <el-button type="danger" round>危险按钮</el-button>
+        <div class="login-wrap">
+            <ul class="menu-tab">
+                <li :class="{'current':item.current}" v-for="(item, index) in menuTab":key="item.id" @click="toggleMenu(item)">{{item.txt}}</li>
+            </ul>
         </div>
     </div>
 </template>
 
 <script>
     export default {
-        name: "index"
+        name: "index",
+        comments:{},
+        data(){
+            return {
+                menuTab:[
+                    {txt:"登录", current:true},
+                    {txt:"注册", current:false}
+                ],
+                isActive:1,
+                // index:1
+            }
+        },
+        created() {
+        },
+        mounted() {
+        },
+        methods:{
+            toggleMenu(item){
+                this.menuTab.forEach(elem => {
+                    elem.current = false
+                })
+                item.current = !item.current
+            }
+        },
+        props:{},
+        watch:{}
     }
 </script>
 
@@ -40,5 +43,24 @@
 #login {
     height: 100vh;
     background-color: #344a5f;
+}
+.login-wrap {
+    width: 330px;
+    margin: auto;
+}
+.menu-tab {
+    text-align: center;
+    li {
+        display: inline-block;
+        width: 88px;
+        line-height: 36px;
+        font-size: 14px;
+        color: #fff;
+        border-radius: 2px;
+        cursor: pointer;
+    }
+}
+.current {
+    background-color: rgba(0,0,0,.1);
 }
 </style>
