@@ -6,7 +6,7 @@
             </ul>
         </div>
         <div class="login-form">
-            <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="demo-ruleForm" size="mini">
+            <el-form :model="ruleForm" status-icon :rules="rules2" ref="ruleForm" class="demo-ruleForm" size="mini">
                 <el-form-item prop="username" class="item-form">
                     <label>邮箱</label>
                     <el-input type="text" v-model="ruleForm.username" auto-complete="off"></el-input>
@@ -36,22 +36,13 @@
 </template>
 
 <script>
-    import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
     import { stripscript, validataEmail, validataPassword, validataCode } from "@/utils/validata";
     export default {
         name: "index",
-        setup(props, context){
-        // setup(props, {refs}){
-            /**
-             * context里面的内容
-             * context.attrs
-             * context.slots
-             * context.parent
-             * context.root
-             * context.emit
-             * context.refs
-             */
-            let validateUsername = (rule, value, callback) => {
+        comments:{},
+        data(){
+            var validateUsername = (rule, value, callback) => {
+                // let reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
                 if (value === '') {
                     callback(new Error('请输入用户名'));
                 } else if (!validataEmail(value)) {
@@ -59,11 +50,11 @@
                 }else {
                     callback();
                 }
-            }
-            let validatePassword = (rule, value, callback) => {
+            };
+            var validatePassword = (rule, value, callback) => {
                 // console.log(stripscript(value));
-                ruleForm.password = stripscript(value);
-                value = ruleForm.password
+                this.ruleForm.password = stripscript(value);
+                value = this.ruleForm.password
                 if (value === '') {
                     callback(new Error('请输入密码'));
                 } else if (!validataPassword(value)) {
@@ -71,21 +62,21 @@
                 } else {
                     callback();
                 }
-            }
-            let validateReplyPassword = (rule, value, callback) => {
+            };
+            var validateReplyPassword = (rule, value, callback) => {
                 // console.log(stripscript(value));
-                if(model.value === 'login'){ return callback();}
-                ruleForm.replyPassword = stripscript(value);
-                value = ruleForm.replyPassword
+                if(this.model === 'login'){ return callback();}
+                this.ruleForm.replyPassword = stripscript(value);
+                value = this.ruleForm.replyPassword
                 if (value === '') {
                     callback(new Error('请确认密码'));
-                } else if (value!=ruleForm.password) {
+                } else if (value!=this.ruleForm.password) {
                     callback(new Error('两次密码不一致'));
                 } else {
                     callback();
                 }
-            }
-            let validateCode = (rule, value, callback) => {
+            };
+            var validateCode = (rule, value, callback) => {
                 // this.ruleForm.code = stripscript(value)
                 if (!value) {
                     return callback(new Error('验证码不能为空'));
@@ -94,96 +85,67 @@
                 } else {
                     callback();
                 }
+            };
+            return {
+                menuTab:[
+                    {txt:"登录", current:true, type:'login'},
+                    {txt:"注册", current:false, type:'register'},
+                ],
+                isActive:1,
+                model:'login',
+                ruleForm: {
+                    username: '',
+                    password: '',
+                    replypassword: '',
+                    code: ''
+                },
+                rules2: {
+                    username: [
+                        { validator: validateUsername, trigger: 'blur' }
+                    ],
+                    password: [
+                        { validator: validatePassword, trigger: 'blur' }
+                    ],
+                    replypassword:[
+                        { validator: validateReplyPassword, trigger: 'blur' }
+                    ],
+                    code: [
+                        { validator: validateCode, trigger: 'blur' }
+                    ]
+                }
+                // index:1
             }
-
-
-            /**
-             * 这里面放置的是data数据、生命周期、自定义函数
-             * 对象数据用reactive()
-             * 基础数据用ref()
-             */
-            const menuTab= reactive([
-                {txt:"登录", current:true, type:'login'},
-                {txt:"注册", current:false, type:'register'},
-            ])
-            const model = ref('login')
-            const ruleForm = reactive({
-                username: '',
-                password: '',
-                replypassword: '',
-                code: ''
-            })
-            const rules = reactive({
-                username: [
-                    { validator: validateUsername, trigger: 'blur' }
-                ],
-                password: [
-                    { validator: validatePassword, trigger: 'blur' }
-                ],
-                replypassword:[
-                    { validator: validateReplyPassword, trigger: 'blur' }
-                ],
-                code: [
-                    { validator: validateCode, trigger: 'blur' }
-                ]
-            })
-
-            // console.log(menuTab)
-            // console.log(model.value)
-            // //isRef函数用来判断对象是否是基础类型
-            // console.log(isRef(menuTab))
-
-            /**
-             * 自定义函数
-             */
-            const toggleMenu = (item => {
-                model.value = item.type
-                menuTab.forEach(elem => {
+        },
+        created() {
+        },
+        mounted() {
+        },
+        methods:{
+            toggleMenu(item){
+                this.model = item.type
+                this.menuTab.forEach(elem => {
                     elem.current = false
                 })
                 item.current = !item.current
-            })
-            const submitForm = (formName => {
-                context.refs[formName].validate((valid) => {
+            },
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
                     if (valid) {
                         alert('submit!');
                     } else {
                         console.log('error submit!!');
                         return false;
                     }
-                })
-            })
-
-
-            //生命周期
-            onMounted(() => {
-
-            })
-            //所有用到的数据都要返回
-            return {
-                menuTab,
-                model,
-                ruleForm,
-                rules,
-                toggleMenu,
-                submitForm,
-                validateUsername,
-                validatePassword,
-                validateReplyPassword,
-                validateCode
-            }
-        },
-        comments:{},
-        // data(){
-        //     return {
-        //     }
-        // },
-        // created() {
-        // },
-        // mounted() {
-        // },
-        methods:{
-
+                });
+            },
+            // stripscript(s) {
+            //     var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]")
+            //     var rs = "";
+            //     for (var i = 0; i < s.length; i++) {
+            //         rs = rs + s.substr(i, 1).replace(pattern, '');
+            //     }
+            //     return rs;
+            // }
         },
         props:{},
         watch:{}
