@@ -36,6 +36,7 @@
 </template>
 
 <script>
+    import axios from "axios"
     import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
     import { stripscript, validataEmail, validataPassword, validataCode } from "@/utils/validata";
     export default {
@@ -144,6 +145,22 @@
                 item.current = !item.current
             })
             const submitForm = (formName => {
+                axios.request({
+                    method: 'get',
+                    url: '/user/12345',
+                    data: {
+                        firstName: 'Fred',
+                        lastName: 'Flintstone'
+                    }
+                })
+                // axios.get('/user?ID=12345')
+                //     .then(function (response) {
+                //         console.log(response);
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //     });
+
                 context.refs[formName].validate((valid) => {
                     if (valid) {
                         alert('submit!');
