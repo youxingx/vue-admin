@@ -1,7 +1,17 @@
 import axios from 'axios'
 
 //创建axios，赋给变量service
-const service = axios.create()
+//手把手撸码前端api,地址 :  http://www.web-jshtml.cn/productapi
+const BASEURL = process.env.NODE_ENV === 'production' ? '':'/simulateagent';
+const service = axios.create({
+        // baseURL: 'https://some-domain.com/api/',
+        baseURL: BASEURL,
+        // baseURL: 'http://www.baidu.com',
+        timeout: 1000,
+    }
+)
+
+// console.log(process.env.VUE_APP_ABC)
 
 // 添加请求拦截器
 service.interceptors.request.use(function (config) {

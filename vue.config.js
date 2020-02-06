@@ -28,7 +28,7 @@ module.exports = {
                 'public':path.resolve(__dirname, './public'),
                 '@c':path.resolve(__dirname, './src/components'),
                 'common':path.resolve(__dirname, './src/common'),
-                'api':path.resolve(__dirname, './src/api'),
+                '@api':path.resolve(__dirname, './src/api'),
                 'views':path.resolve(__dirname, './src/views'),
                 'data':path.resolve(__dirname, './src/data'),
             }
@@ -165,7 +165,38 @@ module.exports = {
         hot:true,
         hotOnly: false,
         /* 使用代理 */
-        proxy: null,
+        // proxy: null,
+        proxy:{
+            '/article': {
+                //你要跨域的域名(包含host、端口号,切记：一定要带上http头);
+                //同一个域名只能设置一次跨域，否则重复报错！
+                target: 'https://baike.baidu.com',
+                changeOrigin: true, //是否跨域，设置为true;(必须)
+            },
+            '/apis': {
+                target: 'https://movie.douban.com/',  // target host
+                // ws: true,  // proxy websockets
+                changeOrigin: true,  // needed for virtual hosted sites
+                pathRewrite: {
+                    '/apis': ''  // rewrite path
+                }
+            },
+            "/simulateagent": {
+                target: 'http://49.4.2.78:8000/',  // target host
+                // ws: true,  // proxy websockets
+                changeOrigin: true,  // needed for virtual hosted sites
+                pathRewrite: {
+                    '/simulateagent':'',
+                }
+            },
+            "/devapi": {
+                target:'http://www.web-jshtml.cn/',  //api服务器地址
+                changeOrigin:true,
+                pathRewrite:{
+                    '/devapi':''
+                }
+            },
+        },
         overlay:{
             warnings:true,
             errors:true

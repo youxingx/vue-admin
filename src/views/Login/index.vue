@@ -23,7 +23,7 @@
                     <label>验证码</label>
                     <el-row :gutter="10">
                         <el-col :span="14"><el-input type="text" v-model.number="ruleForm.code" maxlength="6" minlength="6"></el-input></el-col>
-                        <el-col :span="10"><el-button type="success" class="block">获取验证码</el-button></el-col>
+                        <el-col :span="10"><el-button type="success" class="block" @click="getSms()">获取验证码</el-button></el-col>
                     </el-row>
 
                 </el-form-item>
@@ -37,6 +37,7 @@
 
 <script>
     import axios from "axios"
+    import { GetSms } from "@api/login"
     import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
     import { stripscript, validataEmail, validataPassword, validataCode } from "@/utils/validata";
     export default {
@@ -144,22 +145,24 @@
                 })
                 item.current = !item.current
             })
+            /**
+             * 获取验证码
+             */
+            const getSms = (()=>{
+                let data = {
+                    username:ruleForm.username
+                }
+                GetSms(data)
+            })
             const submitForm = (formName => {
-                axios.request({
-                    method: 'get',
-                    url: '/user/12345',
-                    data: {
-                        firstName: 'Fred',
-                        lastName: 'Flintstone'
-                    }
-                })
-                // axios.get('/user?ID=12345')
-                //     .then(function (response) {
-                //         console.log(response);
-                //     })
-                //     .catch(function (error) {
-                //         console.log(error);
-                //     });
+                // axios.request({
+                //     method: 'get',
+                //     url: '/user/12345',
+                //     data: {
+                //         firstName: 'Fred',
+                //         lastName: 'Flintstone'
+                //     }
+                // })
 
                 context.refs[formName].validate((valid) => {
                     if (valid) {
@@ -171,9 +174,38 @@
                 })
             })
 
-
             //生命周期
             onMounted(() => {
+                // GetSms()
+                // axios.get('/apis/ithil_j/activity/movie_annual2017').then(res => {
+                //     console.log(res.data)
+                // }, res => {
+                //     console.info('调用失败');
+                // })
+                // axios.get('/agent/agent/testapi/test/reverse.action').then(res => {
+                //     console.log(res.data)
+                // }, res => {
+                //     console.info('调用失败');
+                // })
+                // axios.get('/devapi/productapi/getSms').then(res => {
+                //     console.log(res.data)
+                // }, res => {
+                //     console.info('调用失败');
+                // })
+                // axios.get( "/article/d4666d640e2e478d283d8c7f.htm" )
+                //     .then( function ( response ) {
+                //         console.log( response.data );
+                //     } )
+                //     .catch( function ( error ) {
+                //         throw error;
+                //     } );
+                // axios.get( "/devapi/productapi/getSms" )
+                //     .then( function ( response ) {
+                //         console.log( response.data );
+                //     } )
+                //     .catch( function ( error ) {
+                //         throw error;
+                //     } );
 
             })
             //所有用到的数据都要返回
@@ -183,6 +215,7 @@
                 ruleForm,
                 rules,
                 toggleMenu,
+                getSms,
                 submitForm,
                 validateUsername,
                 validatePassword,
