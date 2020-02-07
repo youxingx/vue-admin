@@ -6,7 +6,7 @@
             </ul>
         </div>
         <div class="login-form">
-            <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="demo-ruleForm" size="mini">
+            <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="demo-ruleForm" size="medium">
                 <el-form-item prop="username" class="item-form">
                     <label>邮箱</label>
                     <el-input type="text" v-model="ruleForm.username" auto-complete="off"></el-input>
@@ -28,7 +28,7 @@
 
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="danger" @click="submitForm('ruleForm')" class="login-btn block">提交</el-button>
+                    <el-button type="danger" @click="submitForm('ruleForm')" class="login-btn block" :disabled="loginBtnStatus">{{ model==='login'? "登录": "注册" }}</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -109,6 +109,7 @@
                 {txt:"注册", current:false, type:'register'},
             ])
             const model = ref('login')
+            const loginBtnStatus = ref(true)
             const ruleForm = reactive({
                 username: '',
                 password: '',
@@ -149,6 +150,11 @@
              * 获取验证码
              */
             const getSms = (()=>{
+                if(ruleForm.username == '') {
+                    context.root.$message.error('邮箱不能为空');
+                    return false
+                }
+
                 let data = {
                     username:ruleForm.username
                 }
@@ -212,6 +218,7 @@
             return {
                 menuTab,
                 model,
+                loginBtnStatus,
                 ruleForm,
                 rules,
                 toggleMenu,

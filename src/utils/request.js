@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { Message } from 'element-ui';
 
 //创建axios，赋给变量service
 //手把手撸码前端api,地址 :  http://www.web-jshtml.cn/productapi
@@ -25,6 +26,11 @@ service.interceptors.request.use(function (config) {
 // 添加响应拦截器
 service.interceptors.response.use(function (response) {
     // 对响应数据做点什么
+    // console.log(response)
+    let data = response.data
+    if(!data.code!=200){
+        alert(11111)
+    }
     return response;
 }, function (error) {
     // 对响应错误做点什么
