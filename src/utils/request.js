@@ -8,7 +8,7 @@ const service = axios.create({
         // baseURL: 'https://some-domain.com/api/',
         baseURL: BASEURL,
         // baseURL: 'http://www.baidu.com',
-        timeout: 1000,
+        timeout: 30000,
     }
 )
 
@@ -27,11 +27,15 @@ service.interceptors.request.use(function (config) {
 service.interceptors.response.use(function (response) {
     // 对响应数据做点什么
     // console.log(response)
-    let data = response.data
-    if(!data.code!=200){
-        alert(11111)
+    let data = response.data;
+    if(data.code!==200){
+        // alert(11111)
+        Message.error(data.msg);
+        return Promise.reject(data)
+    }else{
+        // return response;
+        return Promise.resolve(data)
     }
-    return response;
 }, function (error) {
     // 对响应错误做点什么
     return Promise.reject(error);

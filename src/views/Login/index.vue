@@ -8,8 +8,8 @@
         <div class="login-form">
             <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="demo-ruleForm" size="medium">
                 <el-form-item prop="username" class="item-form">
-                    <label>邮箱</label>
-                    <el-input type="text" v-model="ruleForm.username" auto-complete="off"></el-input>
+                    <label for="username">邮箱</label>
+                    <el-input id="username" type="text" v-model="ruleForm.username" auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item prop="password" class="item-form">
                     <label>密码</label>
@@ -23,7 +23,7 @@
                     <label>验证码</label>
                     <el-row :gutter="10">
                         <el-col :span="14"><el-input type="text" v-model.number="ruleForm.code" maxlength="6" minlength="6"></el-input></el-col>
-                        <el-col :span="10"><el-button type="success" class="block" @click="getSms()">获取验证码</el-button></el-col>
+                        <el-col :span="10"><el-button type="success" class="block" @click="getSms()" :disabled="codeBtnObj.status">{{codeBtnObj.text}}</el-button></el-col>
                     </el-row>
 
                 </el-form-item>
@@ -37,7 +37,7 @@
 
 <script>
     import axios from "axios"
-    import { GetSms } from "@api/login"
+    import { GetSms, Register } from "@api/login"
     import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
     import { stripscript, validataEmail, validataPassword, validataCode } from "@/utils/validata";
     export default {
@@ -52,6 +52,13 @@
              * context.root
              * context.emit
              * context.refs
+             * context.listeners
+             * attrs:(...) == this.$attrs
+             * emit:(...) == this.$emit
+             * listeners:(...) == this.$listeners
+             * parent:(...) == this.$parent
+             * refs:(...) == this.$refs
+             * root:(...) == this.$root
              */
             let validateUsername = (rule, value, callback) => {
                 if (value === '') {
@@ -61,11 +68,11 @@
                 }else {
                     callback();
                 }
-            }
+            };
             let validatePassword = (rule, value, callback) => {
                 // console.log(stripscript(value));
                 ruleForm.password = stripscript(value);
-                value = ruleForm.password
+                value = ruleForm.password;
                 if (value === '') {
                     callback(new Error('请输入密码'));
                 } else if (!validataPassword(value)) {
@@ -73,20 +80,20 @@
                 } else {
                     callback();
                 }
-            }
+            };
             let validateReplyPassword = (rule, value, callback) => {
                 // console.log(stripscript(value));
                 if(model.value === 'login'){ return callback();}
                 ruleForm.replyPassword = stripscript(value);
-                value = ruleForm.replyPassword
+                value = ruleForm.replyPassword;
                 if (value === '') {
                     callback(new Error('请确认密码'));
-                } else if (value!=ruleForm.password) {
+                } else if (value!==ruleForm.password) {
                     callback(new Error('两次密码不一致'));
                 } else {
                     callback();
                 }
-            }
+            };
             let validateCode = (rule, value, callback) => {
                 // this.ruleForm.code = stripscript(value)
                 if (!value) {
@@ -96,7 +103,7 @@
                 } else {
                     callback();
                 }
-            }
+            };
 
 
             /**
@@ -107,15 +114,21 @@
             const menuTab= reactive([
                 {txt:"登录", current:true, type:'login'},
                 {txt:"注册", current:false, type:'register'},
-            ])
-            const model = ref('login')
-            const loginBtnStatus = ref(true)
+            ]);
+            const model = ref('login');
+            const loginBtnStatus = ref(true);
+            const codeBtnStatus = ref(false);
+            const codeBtnText = ref("获取验证码");
+            const codeBtnObj = reactive({
+                status: false,
+                text: '获取验证码',
+            });
             const ruleForm = reactive({
                 username: '',
                 password: '',
                 replypassword: '',
                 code: ''
-            })
+            });
             const rules = reactive({
                 username: [
                     { validator: validateUsername, trigger: 'blur' }
@@ -129,7 +142,8 @@
                 code: [
                     { validator: validateCode, trigger: 'blur' }
                 ]
-            })
+            });
+            const timerCount = ref(null);
 
             // console.log(menuTab)
             // console.log(model.value)
@@ -140,26 +154,62 @@
              * 自定义函数
              */
             const toggleMenu = (item => {
-                model.value = item.type
+                // console.log(context.refs.ruleForm.resetFields)
+                model.value = item.type;
                 menuTab.forEach(elem => {
                     elem.current = false
-                })
-                item.current = !item.current
-            })
+                });
+                item.current = !item.current;
+                //重置表单
+                context.refs.ruleForm.resetFields();
+            });
             /**
              * 获取验证码
              */
             const getSms = (()=>{
                 if(ruleForm.username == '') {
                     context.root.$message.error('邮箱不能为空');
-                    return false
+                    return false;
                 }
 
-                let data = {
-                    username:ruleForm.username
+                if(!validataEmail(ruleForm.username)){
+                    context.root.$message.error('邮箱格式错误');
+                    return false;
                 }
-                GetSms(data)
-            })
+
+                //修改获取验证码按钮状态为false
+                // codeBtnStatus.value = true;
+                // codeBtnText.value = "发送中";
+                codeBtnObj.status = true;
+                codeBtnObj.text = '发送中';
+
+                let requestData = {
+                    username:ruleForm.username,
+                    module:model.value,
+                };
+                //设置延迟时间
+                setTimeout(() => {
+
+                }, 5000);
+                GetSms(requestData).then(responseData=>{
+                    console.log("正确:", responseData);
+                    // this.$message({
+                    //     showClose: true,
+                    //     message: '恭喜你，这是一条成功消息',
+                    //     type: 'success'
+                    // });
+                    context.root.$message({
+                        message:responseData.msg,
+                        type: 'success',
+                    });
+                    //启动登录获取注册按钮
+                    loginBtnStatus.value = false;
+                    //调用定时器，倒计时
+                    countDown(5);
+                }).catch(error=>{
+                    console.log("错误:", error);
+                });
+            });
             const submitForm = (formName => {
                 // axios.request({
                 //     method: 'get',
@@ -172,14 +222,43 @@
 
                 context.refs[formName].validate((valid) => {
                     if (valid) {
-                        alert('submit!');
+                        // alert('submit!');
+                        let reqData = {
+                            username:ruleForm.username,
+                            password:ruleForm.password,
+                            code:ruleForm.code,
+                            module:model.value,
+                        };
+                        Register(reqData).then(response =>{
+                            console.log("成功:", response)
+                        }).catch(error => {
+
+                        });
                     } else {
                         console.log('error submit!!');
                         return false;
                     }
                 })
-            })
-
+            });
+            /**
+             * 倒计时
+             */
+            const countDown = ((number)=>{
+                // setTimeout();   clearTimeout(变量)  只执行一次
+                // setInterval();  clearInterval(变量) 不断地执行，需要条件才会停止
+                let count = number;
+                timerCount.value = setInterval(() =>{
+                    count--;
+                    // console.log(count);
+                    if(count===0){
+                        clearInterval(timerCount.value);
+                        codeBtnObj.status = false;
+                        codeBtnObj.text = '获取验证码';
+                    }else{
+                        codeBtnObj.text = `获取验证码(${count}s)`;
+                    }
+                }, 1000)
+            });
             //生命周期
             onMounted(() => {
                 // GetSms()
@@ -213,11 +292,14 @@
                 //         throw error;
                 //     } );
 
-            })
+            });
             //所有用到的数据都要返回
             return {
                 menuTab,
                 model,
+                codeBtnStatus,
+                codeBtnText,
+                codeBtnObj,
                 loginBtnStatus,
                 ruleForm,
                 rules,
