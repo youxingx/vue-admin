@@ -36,7 +36,8 @@
 </template>
 
 <script>
-    import axios from "axios"
+    // import axios from "axios"
+    import sha1 from "js-sha1";
     import { GetSms, Register, Login } from "@api/login"
     import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
     import { stripscript, validataEmail, validataPassword, validataCode } from "@/utils/validata";
@@ -117,14 +118,14 @@
             ]);
             const model = ref('login');
             const loginBtnStatus = ref(true);
-            const codeBtnStatus = ref(false);
-            const codeBtnText = ref("获取验证码");
+            // const codeBtnStatus = ref(false);
+            // const codeBtnText = ref("获取验证码");
             const codeBtnObj = reactive({
                 status: false,
                 text: '获取验证码',
             });
             const ruleForm = reactive({
-                username: '',
+                username: '1097900172@qq.com',
                 password: '',
                 replypassword: '',
                 code: ''
@@ -153,6 +154,9 @@
             /**
              * 自定义函数
              */
+            /**
+             * 切换模块
+             */
             const toggleMenu = (item => {
                 // console.log(context.refs.ruleForm.resetFields)
                 model.value = item.type;
@@ -160,8 +164,18 @@
                     elem.current = false
                 });
                 item.current = !item.current;
+                resetFromData();
+                clearCountDown();
+            });
+            //清除表单数据
+            const resetFromData = (()=>{
                 //重置表单
                 context.refs.ruleForm.resetFields();
+            });
+            //更新按钮状态
+            const updateCodeBtn = ((codeBtn)=>{
+                codeBtnObj.status = codeBtn.status;
+                codeBtnObj.text = codeBtn.text;
             });
             /**
              * 获取验证码
@@ -180,8 +194,9 @@
                 //修改获取验证码按钮状态为false
                 // codeBtnStatus.value = true;
                 // codeBtnText.value = "发送中";
-                codeBtnObj.status = true;
-                codeBtnObj.text = '发送中';
+                updateCodeBtn({status:true, text:"发送中"});
+                // codeBtnObj.status = true;
+                // codeBtnObj.text = '发送中';
 
                 let requestData = {
                     username:ruleForm.username,
@@ -242,10 +257,11 @@
             const login = (()=>{
                 let reqData = {
                     username:ruleForm.username,
-                    password:ruleForm.password,
+                    password:sha1(ruleForm.password),
                     code:ruleForm.code,
                     module:model.value,
                 };
+                // console.log(reqData.password);
                 Login(reqData).then(response =>{
                     console.log("成功:", response)
                 }).catch(error => {
@@ -258,10 +274,11 @@
             const register = (()=>{
                 let reqData = {
                     username:ruleForm.username,
-                    password:ruleForm.password,
+                    password:sha1(ruleForm.password),
                     code:ruleForm.code,
                     module:model.value,
                 };
+                // console.log(reqData.password);
                 Register(reqData).then(response =>{
                     console.log("成功:", response)
                     //跳转到登录
@@ -284,8 +301,9 @@
                     // console.log(count);
                     if(count===0){
                         clearInterval(timerCount.value);
-                        codeBtnObj.status = false;
-                        codeBtnObj.text = '获取验证码';
+                        updateCodeBtn({status:false, text:"获取验证码"});
+                        // codeBtnObj.status = false;
+                        // codeBtnObj.text = '获取验证码';
                     }else{
                         codeBtnObj.text = `获取验证码(${count}s)`;
                     }
@@ -295,8 +313,9 @@
              * 清除倒计时
              */
             const clearCountDown = (() => {
-                codeBtnObj.status = false;
-                codeBtnObj.text = "获取验证码";
+                updateCodeBtn({status:false, text:"获取验证码"});
+                // codeBtnObj.status = false;
+                // codeBtnObj.text = "获取验证码";
                 //清除定时器
                 clearInterval(timerCount.value);
             });
@@ -338,8 +357,8 @@
             return {
                 menuTab,
                 model,
-                codeBtnStatus,
-                codeBtnText,
+                // codeBtnStatus,
+                // codeBtnText,
                 codeBtnObj,
                 loginBtnStatus,
                 ruleForm,
