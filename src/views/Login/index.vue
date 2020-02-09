@@ -22,7 +22,7 @@
                 <el-form-item prop="code" class="item-form">
                     <label>验证码</label>
                     <el-row :gutter="10">
-                        <el-col :span="14"><el-input type="text" v-model.number="ruleForm.code" maxlength="6" minlength="6"></el-input></el-col>
+                        <el-col :span="14"><el-input type="text" v-model="ruleForm.code" maxlength="6" minlength="6"></el-input></el-col>
                         <el-col :span="10"><el-button type="success" class="block" @click="getSms()" :disabled="codeBtnObj.status">{{codeBtnObj.text}}</el-button></el-col>
                     </el-row>
 
@@ -37,7 +37,7 @@
 
 <script>
     import axios from "axios"
-    import { GetSms, Register } from "@api/login"
+    import { GetSms, Register, Login } from "@api/login"
     import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
     import { stripscript, validataEmail, validataPassword, validataCode } from "@/utils/validata";
     export default {
@@ -205,11 +205,12 @@
                     //启动登录获取注册按钮
                     loginBtnStatus.value = false;
                     //调用定时器，倒计时
-                    countDown(5);
+                    countDown(60);
                 }).catch(error=>{
                     console.log("错误:", error);
                 });
             });
+            //提交表单
             const submitForm = (formName => {
                 // axios.request({
                 //     method: 'get',
@@ -223,17 +224,12 @@
                 context.refs[formName].validate((valid) => {
                     if (valid) {
                         // alert('submit!');
-                        let reqData = {
-                            username:ruleForm.username,
-                            password:ruleForm.password,
-                            code:ruleForm.code,
-                            module:model.value,
-                        };
-                        Register(reqData).then(response =>{
-                            console.log("成功:", response)
-                        }).catch(error => {
-
-                        });
+                        model.value === "login"? login() : register();
+                        // if(model.value === "login") {
+                        //     login();
+                        // }else{
+                        //     register();
+                        // }
                     } else {
                         console.log('error submit!!');
                         return false;
@@ -241,9 +237,45 @@
                 })
             });
             /**
+             * 登录
+             */
+            const login = (()=>{
+                let reqData = {
+                    username:ruleForm.username,
+                    password:ruleForm.password,
+                    code:ruleForm.code,
+                    module:model.value,
+                };
+                Login(reqData).then(response =>{
+                    console.log("成功:", response)
+                }).catch(error => {
+
+                });
+            });
+            /**
+             * 注册
+             */
+            const register = (()=>{
+                let reqData = {
+                    username:ruleForm.username,
+                    password:ruleForm.password,
+                    code:ruleForm.code,
+                    module:model.value,
+                };
+                Register(reqData).then(response =>{
+                    console.log("成功:", response)
+                    //跳转到登录
+                    toggleMenu(menuTab[0]);
+                    clearCountDown();
+                }).catch(error => {
+
+                });
+            });
+            /**
              * 倒计时
              */
             const countDown = ((number)=>{
+                if(timerCount.value) { clearInterval(timerCount.value); }
                 // setTimeout();   clearTimeout(变量)  只执行一次
                 // setInterval();  clearInterval(变量) 不断地执行，需要条件才会停止
                 let count = number;
@@ -258,6 +290,15 @@
                         codeBtnObj.text = `获取验证码(${count}s)`;
                     }
                 }, 1000)
+            });
+            /**
+             * 清除倒计时
+             */
+            const clearCountDown = (() => {
+                codeBtnObj.status = false;
+                codeBtnObj.text = "获取验证码";
+                //清除定时器
+                clearInterval(timerCount.value);
             });
             //生命周期
             onMounted(() => {

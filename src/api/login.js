@@ -21,13 +21,19 @@ export function  GetSms(data) {
  * 登录
  */
 export function Login(data) {
-
+    console.log("登录");
+    return service.request({
+        method: "post",
+        url: "/agent/testapi/test/reverse.action",
+        data: data
+    });
 }
 
 /**
  * 注册
  */
 export function Register(data) {
+    console.log("注册");
     return service.request({
         method: "post",
         url: "/agent/testapi/test/reverse.action",
