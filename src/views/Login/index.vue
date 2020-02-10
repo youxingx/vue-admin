@@ -263,7 +263,12 @@
                 };
                 // console.log(reqData.password);
                 Login(reqData).then(response =>{
-                    console.log("成功:", response)
+                    console.log("成功:", response);
+                    context.root.$router.push({
+                        name:'Console',
+                        query:{}
+                    });
+                    //路由跳转
                 }).catch(error => {
 
                 });
