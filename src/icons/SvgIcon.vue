@@ -41,8 +41,8 @@
             },
         },
         setup(props){
-            console.log(props.iconClass);
-            console.log(props.className);
+            // console.log(props.iconClass);
+            // console.log(props.className);
             const msg = ref("手把手撸前端代码");
             //监听数据变化，处理，并返回
             const iconName =computed(() => `#icon-${props.iconClass}`);
@@ -77,6 +77,8 @@
 .svg-icon {
     width: 1em;
     height: 1em;
+    fill:currentColor;
+    color: #fff;
     /*
     fill:currentColor;
     color: red;

@@ -50,23 +50,23 @@ export default new Router({
       },
       // component: () => import('../views/Layout/index.vue'),
       component: Layout,
-      // children:[
-      //   {
-      //     path: '/index',
-      //     name: 'Index',
-      //     meta:{
-      //       name:"首页"
-      //     },
-      //     component: () => import('../views/Console/index.vue')
-      //   }
-      // ]
+      children:[
+        {
+          path: '/index',
+          name: 'Index',
+          meta:{
+            name:"首页"
+          },
+          component: () => import('../views/Console/index.vue')
+        }
+      ]
     },
     /**
      * 信息管理
      */
     {
-      path: '/index',
-      name: 'Index',
+      path: '/info',
+      name: 'infoIndex',
       meta:{
         name:"信息管理",
         icon:"info",
