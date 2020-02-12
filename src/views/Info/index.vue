@@ -6,7 +6,7 @@
                     <div class="label-wrap category">
                         <label for="">类型:</label>
                         <div class="warp-content">
-                            <el-select v-model="value" placeholder="请选择" style="width: 100%">
+                            <el-select v-model="categoryValue" placeholder="请选择" style="width: 100%">
                                 <el-option
                                         v-for="item in options"
                                         :key="item.value"
@@ -34,7 +34,7 @@
                         <div class="warp-content">
                             <el-date-picker
                                     style="width: 100%"
-                                    v-model="value2"
+                                    v-model="dateValue"
                                     type="datetimerange"
                                     align="right"
                                     start-placeholder="开始日期"
@@ -83,7 +83,7 @@
                 </el-col>
                 <el-col :span="3">&nbsp;</el-col>
                 <el-col :span="2">
-                    <el-button type="danger" class="pull-right" style="width: 100%">新增</el-button>
+                    <el-button type="danger" class="pull-right" style="width: 100%" @click="dialogInfo=true">新增</el-button>
                 </el-col>
             </el-row>
         </el-form>
@@ -98,8 +98,8 @@
             <el-table-column prop="user" label="管理员"  width="115"></el-table-column>
             <el-table-column label="操作">
                 <template slot-scope="scope">
-                <el-button size="mini" type="danger">删除</el-button>
-                <el-button size="mini" type="success">编辑</el-button>
+                <el-button size="mini" type="danger" @click="deleteInfo">删除</el-button>
+                <el-button size="mini" type="success" @click="dialogInfo=true">编辑</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -107,7 +107,7 @@
         <!--底部分页-->
         <el-row>
             <el-col :span="12">
-                <el-button size="medium">批量删除</el-button>
+                <el-button size="medium" @click="deleteMulti">批量删除</el-button>
             </el-col>
             <el-col :span="12">
                 <el-pagination
@@ -121,14 +121,22 @@
                 </el-pagination>
             </el-col>
         </el-row>
+
+        <!--新增弹窗-->
+        <!--<DialogInfo :flag="dialogInfo" @close="closeDialog" />-->
+        <DialogInfo :flag.sync="dialogInfo" />
     </div>
 </template>
 
 <script>
+    import DialogInfo from "./dialog/info";
+    import {global} from "@/utils/global_3.0";
     import { reactive, ref, isRef, toRefs, onMounted, computed } from "@vue/composition-api";
     export default {
         name: "infoIndex",
+        components: { DialogInfo },
         setup(props, context){
+            const {confirm} = global();
             const options = reactive(
                 [{
                     value: 1,
@@ -150,10 +158,6 @@
                     label: '标题'
                 }],
             );
-            const searchKey = ref(searchOption[0].value);
-            const value = ref('');
-            const value2 = ref('');
-            const searchKeyWord = ref('');
             const tableData = reactive([
                 {
                     title: '冠状病毒',
@@ -162,6 +166,11 @@
                     user: 'tom'
                 }
             ]);
+            const searchKey = ref(searchOption[0].value);
+            const categoryValue = ref('');
+            const dateValue = ref('');
+            const searchKeyWord = ref('');
+            const dialogInfo = ref(false);
 
             const handleSizeChange = ((val)=>{
 
@@ -170,17 +179,56 @@
             const handleCurrentChange = ((val)=>{
 
             });
+            const deleteInfo = (()=>{
+                confirm({
+                    content:"此操作将永久删除该文件, 是否继续?",
+                    tip:"警告",
+                    fn: confirmDelete,
+                    id: 1111111
+                });
+                // context.root.confirm({
+                //         content:"此操作将永久删除该文件, 是否继续?",
+                //         tip:"警告",
+                //         fn: confirmDelete,
+                //         id: 1111111
+                //     });
+            });
+
+            const deleteMulti = (()=>{
+                confirm({
+                    content:"删除选中, 是否继续?",
+                    fn: confirmDelete,
+                    id: 1111112
+                })
+                // context.root.confirm({
+                //         content:"删除选中, 是否继续?",
+                //         fn: confirmDelete,
+                //         id: 1111112
+                //     });
+            });
+
+            const confirmDelete = ((value)=>{
+                console.log(value)
+            });
+
+            // const closeDialog = (()=>{
+            //     dialogInfo.value = false
+            // });
 
             return {
                 options,
-                value,
-                value2,
                 searchOption,
+                tableData,
+                categoryValue,
+                dateValue,
                 searchKey,
                 searchKeyWord,
-                tableData,
+                dialogInfo,
                 handleSizeChange,
-                handleCurrentChange
+                handleCurrentChange,
+                deleteInfo,
+                deleteMulti
+                // closeDialog
             };
         }
     };
